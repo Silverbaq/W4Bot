@@ -7,6 +7,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot
 import asyncio
 import utils
+import chatcontroller
 
 bot = commands.Bot(command_prefix='!')
 
@@ -59,6 +60,10 @@ async def b64decode(ctx, *text):
     await bot.say(res)
 
 
-
+############### Chat bot ###############
+@bot.command(pass_context=True)
+async def chat(ctx, *text):
+    result = chatcontroller.chat_with_bot(' '.join(text))
+    await bot.say(result)
 
 bot.run(config('TOKEN'))
