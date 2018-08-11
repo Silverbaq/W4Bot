@@ -36,6 +36,15 @@ async def info(ctx, user: discord.Member):
     await bot.say("The users highest role is: {0}".format(user.top_role))
     await bot.say("The user joined at: {0}".format(user.joined_at))
 
+############### Help ###############
+@bot.command(pass_context=True)
+async def showhelp(ctx):
+    await bot.say("The different commands are:")
+    await bot.say("!ping \tThis will return a pong")
+    await bot.say("!info @[user] \tThis will give you information about a user")
+    await bot.say("!b64encode text \tThis will base64 encode the 'text'")
+    await bot.say("!b64decode text \tThis will decode base64")
+
 
 ######## Encoding / Decoding ########
 @bot.command(pass_context=True)
@@ -48,6 +57,8 @@ async def b64encode(ctx, *text):
 async def b64decode(ctx, *text):
     res = utils.decode_base64(' '.join(text))
     await bot.say(res)
+
+
 
 
 bot.run(config('TOKEN'))
