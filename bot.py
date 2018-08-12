@@ -8,8 +8,12 @@ from discord.ext.commands import Bot
 import asyncio
 import utils
 import chatcontroller
+from time import sleep
+from threading import Thread
 
 bot = commands.Bot(command_prefix='!')
+
+auto_chat = False
 
 
 @bot.event
@@ -36,6 +40,7 @@ async def info(ctx, user: discord.Member):
     await bot.say("The users status is: {0}".format(user.status))
     await bot.say("The users highest role is: {0}".format(user.top_role))
     await bot.say("The user joined at: {0}".format(user.joined_at))
+
 
 ############### Help ###############
 @bot.command(pass_context=True)
@@ -65,5 +70,27 @@ async def b64decode(ctx, *text):
 async def chat(ctx, *text):
     result = chatcontroller.chat_with_bot(' '.join(text))
     await bot.say(result)
+
+
+# Auto chat
+@bot.command(pass_context=True)
+async def enable_auto(ctx):
+    auto_chat = True
+    Thread(auto_chatbot()).start()
+    await bot.say(auto_chat)
+
+
+@bot.command(pass_context=True)
+async def disable_auto(ctx):
+    auto_chat = False
+    await bot.say(auto_chat)
+
+
+def auto_chatbot():
+    while auto_chat:
+        result = chatcontroller.chat_with_bot(' ')
+        bot.say(result)
+        sleep(10)
+
 
 bot.run(config('TOKEN'))
