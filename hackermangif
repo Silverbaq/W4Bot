@@ -1,0 +1,9 @@
+@bot.command(pass_context=True)
+async def hackerman(ctx):
+    await bot.say("https://media.giphy.com/media/VHHxxFAeLaYzS/giphy.gif")
+    
+    """
+    We need that sweet grapichs.
+    Needs to be tested. 
+    gif format should be correct, but sizing isn't taken into consideration. 
+    """
