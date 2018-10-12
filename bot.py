@@ -13,8 +13,6 @@ from threading import Thread
 
 bot = commands.Bot(command_prefix='!')
 
-auto_chat = False
-
 
 @bot.event
 async def on_ready():
@@ -40,6 +38,17 @@ async def info(ctx, user: discord.Member):
     await bot.say("The users status is: {0}".format(user.status))
     await bot.say("The users highest role is: {0}".format(user.top_role))
     await bot.say("The user joined at: {0}".format(user.joined_at))
+
+
+############### GIF ###############
+@bot.command(pass_context=True)
+async def hackerman(ctx):
+    await bot.say("https://media.giphy.com/media/VHHxxFAeLaYzS/giphy.gif")
+
+
+@bot.command(pass_context=True)
+async def bob(ctx):
+    await bot.say("https://media.giphy.com/media/hcwIm2NdTYhva/giphy.gif")
 
 
 ############### Help ###############
@@ -73,11 +82,18 @@ async def chat(ctx, *text):
 
 
 # Auto chat
+'''
 @bot.command(pass_context=True)
 async def enable_auto(ctx):
     auto_chat = True
-    Thread(auto_chatbot()).start()
+    Thread(target=auto_chatbot).start()
     await bot.say(auto_chat)
+
+
+@bot.command(pass_context=True)
+async def chat2(*text):
+    result = chatcontroller.chat_with_bot(' '.join(text))
+    await bot.say(result)
 
 
 @bot.command(pass_context=True)
@@ -87,10 +103,11 @@ async def disable_auto(ctx):
 
 
 def auto_chatbot():
+    global auto_chat
+    auto_chat = True
     while auto_chat:
-        result = chatcontroller.chat_with_bot(' ')
-        bot.say(result)
+        chat2(' ')
         sleep(10)
-
+'''
 
 bot.run(config('TOKEN'))

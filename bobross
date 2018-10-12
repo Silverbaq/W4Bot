@@ -1,9 +1,0 @@
-
-
-@bot.command(pass_context=True)
-async def bob(ctx):
-    await bot.say("https://media.giphy.com/media/hcwIm2NdTYhva/giphy.gif")
-
-"""
-Little accidents are okay. <3
-"""
