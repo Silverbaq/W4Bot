@@ -8,6 +8,8 @@ from discord.ext.commands import Bot
 import asyncio
 import utils
 import chatcontroller
+from random import randint
+from games import RockPaperScissors
 from time import sleep
 from threading import Thread
 
@@ -59,6 +61,24 @@ async def showhelp(ctx):
     await bot.say("!info @[user] \tThis will give you information about a user")
     await bot.say("!b64encode text \tThis will base64 encode the 'text'")
     await bot.say("!b64decode text \tThis will decode base64")
+
+
+######## Utils ########
+@bot.command(pass_context=True)
+async def random(ctx, max):
+    try:
+        number = randint(0, int(max))
+    except:
+        number = 'That\'s not a number'
+    await bot.say(number)
+
+@bot.command(pass_context=True)
+async def rps(ctx, hand):
+    rps = RockPaperScissors()
+    result = rps.play(hand)
+    await bot.say(result)
+
+
 
 
 ######## Encoding / Decoding ########
