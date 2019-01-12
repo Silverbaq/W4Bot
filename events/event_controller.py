@@ -1,38 +1,12 @@
-from google.oauth2 import service_account
-import googleapiclient.discovery
-
-from events.event_db_controller import EventDBController
-from events.event_model import Event, Person
 from datetime import datetime
+from events.sheet_provider import SheetProvider
+from events.event_model import Event, Person
+from events.event_db_controller import EventDBController
 
 
 class EventController(object):
-    SPREADSHEET_ID = '1lRt-zBiF9nIB-MRnfCYudG9THZahf8rcJfuBBz3Wn0I'
-    RANGE_NAME = 'ark!A2:E'
-
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-    SERVICE_ACCOUNT_FILE = 'events/w4crew.json'
-    credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-
-    service = googleapiclient.discovery.build('sheets', 'v4', credentials=credentials)
-
     event_db_controller = EventDBController()
-
-    def read_sheet(self):
-        # Call the Sheets API
-        sheet = self.service.spreadsheets()
-        result = sheet.values().get(spreadsheetId=self.SPREADSHEET_ID,
-                                    range=self.RANGE_NAME).execute()
-        values = result.get('values', [])
-
-        # Read the output
-        if not values:
-            print('No data found.')
-        else:
-            for row in values:
-                self.add_event_from_row(row)
-                print(row)
+    sheet_provider = SheetProvider()
 
     def add_event_from_row(self, row):
         title = row[0]
@@ -52,3 +26,9 @@ class EventController(object):
 
     def get_all_events(self):
         return self.event_db_controller.get_all_events()
+
+    def add_sheet_to_db(self):
+        rows = self.sheet_provider.read_sheet()
+        for row in rows:
+            if not self.event_db_controller.is_event_pressent(row.title):
+               self.add_event_from_row(row)

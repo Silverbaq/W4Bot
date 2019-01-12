@@ -6,7 +6,7 @@ from events.event_model import Event, Base, Person
 
 
 class EventDBController(object):
-    engine = create_engine('sqlite:///events.db')
+    engine = create_engine('sqlite:///events/events.db')
     # Bind the engine to the metadata of the Base class so that the
     # declaratives can be accessed through a DBSession instance
     Base.metadata.bind = engine
@@ -58,3 +58,7 @@ class EventDBController(object):
     def get_all_events(self):
         events = self.session.query(Event).all()
         return events
+
+    def is_event_pressent(self, title):
+        event = self.session.query(Event).filter_by(title=title).first()
+        return event is not None

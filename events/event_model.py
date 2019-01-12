@@ -38,7 +38,7 @@ class Event(Base):
 
 # Create an engine that stores data in the local directory's
 # sqlalchemy_example.db file.
-engine = create_engine('sqlite:///events.db')
+engine = create_engine('sqlite:///events/events.db')
 
 # Create all tables in the engine. This is equivalent to "Create Table"
 # statements in raw SQL.

@@ -69,7 +69,7 @@ async def show_events(ctx):
 @bot.command(pass_context=True)
 async def gen_events_from_sheet(ctx):
     controller = EventController()
-    controller.read_sheet()
+    controller.add_sheet_to_db()
 
     await bot.say("OK! :+1:")
 
