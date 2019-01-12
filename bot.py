@@ -10,6 +10,7 @@ import utils
 import chatcontroller
 from random import randint
 from games import RockPaperScissors
+from events.event_controller import EventDBController, EventController
 from time import sleep
 from threading import Thread
 
@@ -51,6 +52,26 @@ async def hackerman(ctx):
 @bot.command(pass_context=True)
 async def bob(ctx):
     await bot.say("https://media.giphy.com/media/hcwIm2NdTYhva/giphy.gif")
+
+############### Events ###############
+@bot.command(pass_context=True)
+async def show_events(ctx):
+    controller = EventDBController()
+    events = controller.get_all_events()
+
+    response = ""
+    for event in events:
+        row = 'Date: {0}\nTitle: {1}\nCreated by: {2}\nDescription: {3}\n\n'.format(event.date, event.title, event.created_by.name, event.description)
+        response = response + row
+
+    await bot.say(response)
+
+@bot.command(pass_context=True)
+async def gen_events_from_sheet(ctx):
+    controller = EventController()
+    controller.read_sheet()
+
+    await bot.say("OK! :+1:")
 
 
 ############### Help ###############

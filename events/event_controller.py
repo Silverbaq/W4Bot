@@ -3,6 +3,7 @@ import googleapiclient.discovery
 
 from events.event_db_controller import EventDBController
 from events.event_model import Event, Person
+from datetime import datetime
 
 
 class EventController(object):
@@ -10,7 +11,7 @@ class EventController(object):
     RANGE_NAME = 'ark!A2:E'
 
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-    SERVICE_ACCOUNT_FILE = 'w4crew.json'
+    SERVICE_ACCOUNT_FILE = 'events/w4crew.json'
     credentials = service_account.Credentials.from_service_account_file(
         SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
@@ -30,16 +31,17 @@ class EventController(object):
             print('No data found.')
         else:
             for row in values:
-                title = row[0]
-                description = row[1]
-                date = row[2]
-                created_by = row[3]
-
-
-                person = self.event_db_controller.find_person(created_by)
-
-                print('%s, %s' % (row[0], row[3]))
+                self.add_event_from_row(row)
                 print(row)
+
+    def add_event_from_row(self, row):
+        title = row[0]
+        description = row[1]
+        date = datetime.strptime(row[2], '%d-%m-%Y')
+        created_by = row[3]
+
+        person = self.find_person_or_create(created_by)
+        self.event_db_controller.add_event(title, description, date, person)
 
     def find_person_or_create(self, name):
         person = self.event_db_controller.find_person(name)
@@ -48,6 +50,5 @@ class EventController(object):
             return self.event_db_controller.find_person(name)
         return person
 
-
-event_controller = EventController()
-event_controller.read_sheet()
+    def get_all_events(self):
+        return self.event_db_controller.get_all_events()
