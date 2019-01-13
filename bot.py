@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot
 import asyncio
 import utils
-#import chatcontroller
+import chatcontroller
 from random import randint
 from games import RockPaperScissors
 from events.event_controller import EventDBController, EventController
@@ -152,13 +152,13 @@ async def b64decode(ctx, *text):
     res = utils.decode_base64(' '.join(text))
     await bot.say(res)
 
-'''
+
 ############### Chat bot ###############
 @bot.command(pass_context=True)
 async def chat(ctx, *text):
     result = chatcontroller.chat_with_bot(' '.join(text))
     await bot.say(result)
-'''
+
 
 # Auto chat
 '''
