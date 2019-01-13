@@ -45,6 +45,13 @@ class EventDBController(object):
         person = self.session.query(Person).filter_by(name=name).first()
         return person
 
+    def find_person_or_add(self,name):
+        person = self.find_person(name)
+        if person: return person
+        else:
+            self.add_person(name)
+            return self.find_person(name)
+
     def add_person(self, name):
         new_person = Person(name=name)
         self.session.add(new_person)
@@ -62,3 +69,24 @@ class EventDBController(object):
     def is_event_pressent(self, title):
         event = self.session.query(Event).filter_by(title=title).first()
         return event is not None
+
+    def find_event(self, title):
+        return self.session.query(Event).filter_by(title=title).first()
+
+    def like_event(self, title):
+        event = self.session.query(Event).filter_by(title=title).first()
+        if event is not None:
+            event.likes = event.likes + 1
+            self.session.commit()
+            return True
+        return False
+
+    def signup_for_event(self, title, name):
+        person = self.find_person_or_add(name)
+        event = self.find_event(title)
+        if event:
+            event.signups.append(person)
+            self.session.commit()
+            return True
+        return False
+

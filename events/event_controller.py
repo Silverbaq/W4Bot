@@ -27,8 +27,18 @@ class EventController(object):
     def get_all_events(self):
         return self.event_db_controller.get_all_events()
 
+    def get_event(self, title):
+        return self.event_db_controller.find_event(title)
+
+
     def add_sheet_to_db(self):
         rows = self.sheet_provider.read_sheet()
         for row in rows:
-            if not self.event_db_controller.is_event_pressent(row.title):
+            if not self.event_db_controller.is_event_pressent(row[0]):
                self.add_event_from_row(row)
+
+    def like_event(self, title):
+        return self.event_db_controller.like_event(title)
+
+    def sign_up_for_event(self, title, name):
+        return self.event_db_controller.signup_for_event(title, name)

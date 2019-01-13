@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot
 import asyncio
 import utils
-import chatcontroller
+#import chatcontroller
 from random import randint
 from games import RockPaperScissors
 from events.event_controller import EventDBController, EventController
@@ -59,9 +59,11 @@ async def show_events(ctx):
     controller = EventDBController()
     events = controller.get_all_events()
 
+    events.sort(key=lambda e: e.date)
+
     response = ""
     for event in events:
-        row = 'Date: {0}\nTitle: {1}\nCreated by: {2}\nDescription: {3}\n\n'.format(event.date, event.title, event.created_by.name, event.description)
+        row = 'Date: {0}\nTitle: {1}\nCreated by: {2}\nDescription: {3}\nLikes: {4}\n\n'.format(event.date, event.title, event.created_by.name, event.description, event.likes)
         response = response + row
 
     await bot.say(response)
@@ -73,6 +75,42 @@ async def gen_events_from_sheet(ctx):
 
     await bot.say("OK! :+1:")
 
+@bot.command(pass_context=True)
+async def like_event(ctx, *text):
+    controller = EventController()
+    result = controller.like_event(' '.join(text))
+    if result:
+        await bot.say("OK! :+1:")
+    else:
+        await bot.say("Error: It did not go well...")
+
+
+@bot.command(pass_context=True)
+async def sign_up(ctx, *text):
+    user = ctx.message.author
+    controller = EventController()
+    result = controller.sign_up_for_event(' '.join(text), user.name)
+    if result:
+        await bot.say("OK! :+1:")
+    else:
+        await bot.say("Error: It did not go well...")
+
+
+@bot.command(pass_context=True)
+async def show_event(ctx, *text):
+    controller = EventController()
+    event = controller.get_event(' '.join(text))
+    if event:
+        signups = [x.name for x in event.signups]
+        message = 'Date: {0}\nTitle: {1}\nCreated by: {2}\nDescription: {3}\nLikes: {4}\nSign-ups: {5}\n\n'.format(event.date, event.title,
+                                                                                                event.created_by.name,
+                                                                                                event.description,
+                                                                                                event.likes,
+                                                                                                str(signups))
+
+        await bot.say(message)
+    else:
+        await bot.say("Error: It did not go well...")
 
 ############### Help ###############
 @bot.command(pass_context=True)
@@ -114,13 +152,13 @@ async def b64decode(ctx, *text):
     res = utils.decode_base64(' '.join(text))
     await bot.say(res)
 
-
+'''
 ############### Chat bot ###############
 @bot.command(pass_context=True)
 async def chat(ctx, *text):
     result = chatcontroller.chat_with_bot(' '.join(text))
     await bot.say(result)
-
+'''
 
 # Auto chat
 '''
