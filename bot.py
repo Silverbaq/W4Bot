@@ -3,7 +3,6 @@
 
 from decouple import config
 import discord
-from discord.ext import commands
 from discord.ext.commands import Bot
 import asyncio
 import utils
@@ -11,17 +10,23 @@ import chatcontroller
 from random import randint
 from games import RockPaperScissors
 from events.event_controller import EventDBController, EventController
-from time import sleep
-from threading import Thread
+from crontab import CronTab
+from streaming import controller as stream_controller
+from streaming import model as stream_model
+import traceback
+from datetime import datetime
 
-bot = commands.Bot(command_prefix='!')
+bot = Bot(command_prefix='!')
+client = discord.Client()
 
 
+############### Basics ###############
 @bot.event
 async def on_ready():
     print('Ready when you are')
     print('I am running on ' + bot.user.name)
-    print('With the ID: ' + bot.user.id)
+    print('With the ID: {0}'.format(bot.user.id))
+    check_streams()
 
 
 @bot.event
@@ -53,6 +58,7 @@ async def hackerman(ctx):
 async def bob(ctx):
     await bot.say("https://media.giphy.com/media/hcwIm2NdTYhva/giphy.gif")
 
+
 ############### Events ###############
 @bot.command(pass_context=True)
 async def show_events(ctx):
@@ -63,10 +69,14 @@ async def show_events(ctx):
 
     response = ""
     for event in events:
-        row = 'Date: {0}\nTitle: {1}\nCreated by: {2}\nDescription: {3}\nLikes: {4}\n\n'.format(event.date, event.title, event.created_by.name, event.description, event.likes)
+        row = 'Date: {0}\nTitle: {1}\nCreated by: {2}\nDescription: {3}\nLikes: {4}\n\n'.format(event.date, event.title,
+                                                                                                event.created_by.name,
+                                                                                                event.description,
+                                                                                                event.likes)
         response = response + row
 
     await bot.say(response)
+
 
 @bot.command(pass_context=True)
 async def gen_events_from_sheet(ctx):
@@ -74,6 +84,7 @@ async def gen_events_from_sheet(ctx):
     controller.add_sheet_to_db()
 
     await bot.say("OK! :+1:")
+
 
 @bot.command(pass_context=True)
 async def like_event(ctx, *text):
@@ -102,15 +113,17 @@ async def show_event(ctx, *text):
     event = controller.get_event(' '.join(text))
     if event:
         signups = [x.name for x in event.signups]
-        message = 'Date: {0}\nTitle: {1}\nCreated by: {2}\nDescription: {3}\nLikes: {4}\nSign-ups: {5}\n\n'.format(event.date, event.title,
-                                                                                                event.created_by.name,
-                                                                                                event.description,
-                                                                                                event.likes,
-                                                                                                str(signups))
+        message = 'Date: {0}\nTitle: {1}\nCreated by: {2}\nDescription: {3}\nLikes: {4}\nSign-ups: {5}\n\n'.format(
+            event.date, event.title,
+            event.created_by.name,
+            event.description,
+            event.likes,
+            str(signups))
 
         await bot.say(message)
     else:
         await bot.say("Error: It did not go well...")
+
 
 ############### Help ###############
 @bot.command(pass_context=True)
@@ -131,13 +144,12 @@ async def random(ctx, max):
         number = 'That\'s not a number'
     await bot.say(number)
 
+
 @bot.command(pass_context=True)
 async def rps(ctx, hand):
     rps = RockPaperScissors()
     result = rps.play(hand)
     await bot.say(result)
-
-
 
 
 ######## Encoding / Decoding ########
@@ -158,6 +170,33 @@ async def b64decode(ctx, *text):
 async def chat(ctx, *text):
     result = chatcontroller.chat_with_bot(' '.join(text))
     await bot.say(result)
+
+
+############### Streaming ###############
+async def tell_about_stream(interval, channel, user):
+    cron = CronTab(interval)
+    while True:
+        await asyncio.sleep(cron.next(default_utc=False))
+        if stream_controller.should_annouce(user):
+            try:
+                if user.stream_started:
+                    await channel.send(f'{user.user_login} is having a live stream : https://www.twitch.tv/{user.user_login}')
+                else:
+                    await channel.send(f'{user.user_login} ended stream at {datetime.now()}')
+            except Exception as ex:
+                print(f'I could not send message to `{channel}` :(, Exception: {ex}')
+
+
+def check_streams():
+    for user_login in stream_controller.user_logins:
+        interval = '*/1 * * * *'
+        channel = bot.get_channel(config('CHANNEL_ID'))
+
+        user = stream_model.Streamer(user_login)
+        try:
+            bot.loop.create_task(tell_about_stream(interval, channel, user))
+        except:
+            print('[-] Could not schedule task.')
 
 
 # Auto chat
