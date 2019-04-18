@@ -182,7 +182,7 @@ async def tell_about_stream(interval, channel, user):
                 if user.stream_started:
                     await channel.send('{0} is having a live stream : https://www.twitch.tv/{0}'.format(user.user_login))
                 else:
-                    await channel.send('{user.user_login} stream has ended'.format(user.user_login))
+                    await channel.send('{0} stream has ended'.format(user.user_login))
             except Exception as ex:
                 print('I could not send message to `{0}` :(, Exception: {1}'.format(channel, ex))
 
@@ -190,7 +190,7 @@ async def tell_about_stream(interval, channel, user):
 def check_streams():
     for user_login in stream_controller.user_logins:
         interval = '*/1 * * * *'
-        channel = bot.get_channel(config('CHANNEL_ID'))
+        channel = bot.get_channel(int(config('CHANNEL_ID')))
 
         user = stream_model.Streamer(user_login)
         try:
