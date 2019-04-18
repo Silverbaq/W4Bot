@@ -180,11 +180,11 @@ async def tell_about_stream(interval, channel, user):
         if stream_controller.should_annouce(user):
             try:
                 if user.stream_started:
-                    await channel.send(f'{user.user_login} is having a live stream : https://www.twitch.tv/{user.user_login}')
+                    await channel.send('{0} is having a live stream : https://www.twitch.tv/{0}'.format(user.user_login))
                 else:
-                    await channel.send(f'{user.user_login} ended stream at {datetime.now()}')
+                    await channel.send('{user.user_login} stream has ended'.format(user.user_login))
             except Exception as ex:
-                print(f'I could not send message to `{channel}` :(, Exception: {ex}')
+                print('I could not send message to `{0}` :(, Exception: {1}'.format(channel, ex))
 
 
 def check_streams():
