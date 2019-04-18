@@ -190,7 +190,7 @@ async def tell_about_stream(interval, channel, user):
 def check_streams():
     for user_login in stream_controller.user_logins:
         interval = '*/1 * * * *'
-        channel = bot.get_channel(int(config('CHANNEL_ID')))
+        channel = bot.get_channel(475717127987396608)
 
         user = stream_model.Streamer(user_login)
         try:
