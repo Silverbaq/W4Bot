@@ -1,6 +1,7 @@
 discord
 python-decouple
 chatterbot
+chatterbot_corpus
 
 google-api-python-client
 oauth2client
