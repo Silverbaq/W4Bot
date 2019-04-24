@@ -1,4 +1,4 @@
-FROM python:3.6.8-jessie
+FROM python:3.5.3-jessie
 ADD . /code
 WORKDIR /code
 RUN pip install -r requirements.txt
